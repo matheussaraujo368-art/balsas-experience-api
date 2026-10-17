@@ -1,0 +1,100 @@
+# Coleção de testes da Balsas Experience API (extensão REST Client do VS Code)
+# Antes de rodar em sequência: npm run db:setup  (volta o banco às 8 atrações)
+# Para testar a API publicada, troque o endereço abaixo pelo do Render.
+
+@api = http://localhost:3000
+# @api = https://balsas-experience-api.onrender.com
+
+### 1 - Saúde da aplicação (esperado: 200)
+GET {{api}}/health
+
+### 2 - Identificação da API (esperado: 200)
+GET {{api}}/
+
+### 3 - Listar todas (esperado: 200, 8 atrações)
+GET {{api}}/atracoes
+
+### 4 - Buscar por id (esperado: 200, Igreja Matriz)
+GET {{api}}/atracoes/1
+
+### 5 - Id inexistente (esperado: 404)
+GET {{api}}/atracoes/999
+
+### 6 - Filtrar por categoria (esperado: 200, 3 atrações)
+GET {{api}}/atracoes?categoria=Natureza%20e%20Aventura
+
+### 7 - Filtrar por tag (esperado: 200, 2 atrações)
+GET {{api}}/atracoes?tag=cachoeira
+
+### 8 - Categoria + tag (esperado: 200, 3 atrações)
+GET {{api}}/atracoes?categoria=Natureza%20e%20Aventura&tag=aventura
+
+### 9 - Criar (esperado: 201, Location: /atracoes/9)
+POST {{api}}/atracoes
+Content-Type: application/json
+
+{
+  "nome": "Parque de Lazer",
+  "categoria": "Lazer",
+  "descricao": "Espaço destinado ao lazer e à convivência.",
+  "localizacao": { "cidade": "Balsas", "estado": "MA" },
+  "distanciaCentroKm": 3,
+  "tags": ["lazer", "família"]
+}
+
+### 10 - Criar com corpo inválido (esperado: 400)
+POST {{api}}/atracoes
+Content-Type: application/json
+
+{ "nome": "" }
+
+### 11 - Substituir (esperado: 200)
+PUT {{api}}/atracoes/1
+Content-Type: application/json
+
+{
+  "nome": "Igreja Matriz de Santo Antônio",
+  "categoria": "Histórico e Urbano",
+  "descricao": "Marco zero da cidade, ao lado da Praça da Matriz.",
+  "localizacao": { "cidade": "Balsas", "estado": "MA" },
+  "distanciaCentroKm": 0,
+  "tags": ["história", "cultura", "arquitetura"]
+}
+
+### 12 - Remover (esperado: 204)
+DELETE {{api}}/atracoes/3
+
+### 13 - Remover de novo (esperado: 404)
+DELETE {{api}}/atracoes/3
+
+### 14 - Rota inexistente (esperado: 404)
+GET {{api}}/abc
+
+### ---------- Desafios ----------
+
+### D1 - Categorias sem repetição
+GET {{api}}/categorias
+
+### D2 - Filtro por cidade
+GET {{api}}/atracoes?cidade=Balsas
+
+### D3 - Até 60 km do centro (ignora distância null)
+GET {{api}}/atracoes?ate=60
+
+### D4 - Ordenar por nome
+GET {{api}}/atracoes?ordem=nome
+
+### E2 - PATCH: altera só a distância, mantém o resto
+PATCH {{api}}/atracoes/2
+Content-Type: application/json
+
+{ "distanciaCentroKm": 1.5 }
+
+### E4 - Paginação
+GET {{api}}/atracoes?pagina=1&tamanho=3
+
+### Corpo JSON quebrado (esperado: 400)
+POST {{api}}/atracoes
+Content-Type: application/json
+
+{ "nome": ,

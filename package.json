@@ -1,0 +1,21 @@
+{
+  "name": "balsas-experience-api",
+  "version": "2.0.0",
+  "description": "API REST de experiências turísticas em Balsas-MA, com banco de dados PostgreSQL on-line (Neon)",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "db:setup": "node src/db/setup.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "pg": "^8.16.3"
+  }
+}
