@@ -1,8 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { pool } from './db/conexao.js';
+import { prisma } from './prisma.js';
 import atracoesRoutes from './routes/atracoes.routes.js';
-import categoriasRoutes from './routes/categorias.routes.js';
 
 const app = express();
 const PORTA = process.env.PORT || 3000;
@@ -15,22 +14,20 @@ app.get('/', (req, res) => {
     nome: 'Balsas Experience API',
     versao: '2.0.0',
     descricao: 'API de experiências turísticas em Balsas-MA',
-    banco: 'PostgreSQL (Neon)',
   });
 });
 
 // Saúde: a aplicação está de pé? E o banco responde?
 app.get('/health', async (req, res) => {
   try {
-    await pool.query('SELECT 1');
-    res.json({ status: 'ok', banco: 'conectado' });
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok' });
   } catch {
     res.status(503).json({ status: 'erro', banco: 'indisponível' });
   }
 });
 
 app.use('/atracoes', atracoesRoutes);
-app.use('/categorias', categoriasRoutes);
 
 // Qualquer caminho que não casou com as rotas acima
 app.use((req, res) => {
