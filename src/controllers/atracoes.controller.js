@@ -1,6 +1,6 @@
 import { prisma } from '../prisma.js';
 import { montarConsulta, ErroDeFiltro } from '../utils/filtros.js';
-import { validarCompleto, validarParcial, lerLocal } from '../utils/validacao.js';
+import { validarCompleto, validarParcial, validarAvaliacao, lerLocal } from '../utils/validacao.js';
 
 // No Express 5, um erro lançado dentro de uma função async vai sozinho
 // para o middleware de erro do app.js.
@@ -161,4 +161,44 @@ export async function remover(req, res) {
     if (erro.code === 'P2025') return naoEncontrada(res);
     throw erro;
   }
+}
+
+// POST /atracoes/:id/avaliacoes
+export async function avaliar(req, res) {
+  const atracaoId = lerId(req.params.id);
+  if (!atracaoId) return naoEncontrada(res);
+
+  const corpo = req.body ?? {};
+  const problema = validarAvaliacao(corpo);
+  if (problema) return res.status(400).json({ erro: problema });
+
+  try {
+    const avaliacao = await prisma.avaliacao.create({
+      data: {
+        visitante: corpo.visitante,
+        nota: corpo.nota,
+        comentario: corpo.comentario ?? null,
+        atracao: { connect: { id: atracaoId } },
+      },
+    });
+    res.status(201).location(`/atracoes/${atracaoId}`).json(avaliacao);
+  } catch (erro) {
+    if (erro.code === 'P2025') return naoEncontrada(res);
+    throw erro;
+  }
+}
+
+// DELETE /atracoes/:id/avaliacoes/:avaliacaoId
+export async function removerAvaliacao(req, res) {
+  const atracaoId = lerId(req.params.id);
+  const avaliacaoId = lerId(req.params.avaliacaoId);
+  if (!atracaoId || !avaliacaoId) {
+    return res.status(404).json({ erro: 'Avaliação não encontrada' });
+  }
+
+  // deleteMany com as duas chaves garante que a avaliação é DESTA atração
+  const { count } = await prisma.avaliacao.deleteMany({ where: { id: avaliacaoId, atracaoId } });
+  if (count === 0) return res.status(404).json({ erro: 'Avaliação não encontrada' });
+
+  res.status(204).end();
 }

@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { prisma } from './prisma.js';
 import atracoesRoutes from './routes/atracoes.routes.js';
+import categoriasRoutes from './routes/categorias.routes.js';
+import tagsRoutes from './routes/tags.routes.js';
 
 const app = express();
 const PORTA = process.env.PORT || 3000;
@@ -28,6 +30,8 @@ app.get('/health', async (req, res) => {
 });
 
 app.use('/atracoes', atracoesRoutes);
+app.use('/categorias', categoriasRoutes);
+app.use('/tags', tagsRoutes);
 
 // Qualquer caminho que não casou com as rotas acima
 app.use((req, res) => {
