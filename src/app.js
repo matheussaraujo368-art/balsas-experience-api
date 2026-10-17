@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
   res.json({
     nome: 'Balsas Experience API',
     versao: '2.0.0',
-    descricao: 'API de experiências turísticas em Balsas-MA',
+    descricao: 'API de experiências turísticas em Balsas-MA, com PostgreSQL e Prisma',
   });
 });
 
@@ -41,6 +41,16 @@ app.use((req, res) => {
 // Middleware de erro: quatro parâmetros, sempre por último
 app.use((erro, req, res, next) => {
   console.error(erro);
+
+  // P2002: violação de campo único, como duas categorias com o mesmo nome
+  if (erro.code === 'P2002') {
+    return res.status(409).json({ erro: 'Já existe um registro com esse valor único' });
+  }
+  // P2025: o registro que a operação esperava não existe
+  if (erro.code === 'P2025') {
+    return res.status(404).json({ erro: 'Registro não encontrado' });
+  }
+
   const status = erro.status ?? 500;
   const mensagem = status === 500 ? 'Erro interno no servidor' : 'Corpo da requisição inválido';
   res.status(status).json({ erro: mensagem });
