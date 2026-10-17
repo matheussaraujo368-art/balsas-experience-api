@@ -1,10 +1,11 @@
 # Coleção de testes da Balsas Experience API, Aula 08 (extensão REST Client do VS Code)
 # Antes de rodar em sequência: npm run seed  (volta o banco às 8 atrações e 3 avaliações)
-# Os ids mudam a cada seed: confira em GET /atracoes e ajuste @id abaixo.
+# @id = Cachoeira do Macapá (tem 2 avaliações) num banco recém-criado. Os ids mudam a cada
+# novo seed: confira em GET /atracoes e ajuste o @id.
 
 @api = http://localhost:3000
 # @api = https://SEU-SERVICO.onrender.com
-@id = 1
+@id = 7
 
 ### 1 - Saúde (esperado: 200 e {"status":"ok"})
 GET {{api}}/health
@@ -50,7 +51,7 @@ Content-Type: application/json
 { "nome": "" }
 
 ### 11 - Substituir trocando as tags (esperado: 200 com uma tag só)
-PUT {{api}}/atracoes/{{criada.response.body.id}}
+PUT {{api}}/atracoes/{{criada.response.body.$.id}}
 Content-Type: application/json
 
 {
@@ -62,22 +63,22 @@ Content-Type: application/json
 }
 
 ### 12 - Avaliar com nota 5 (esperado: 201)
-POST {{api}}/atracoes/{{criada.response.body.id}}/avaliacoes
+POST {{api}}/atracoes/{{criada.response.body.$.id}}/avaliacoes
 Content-Type: application/json
 
 { "visitante": "Ana", "nota": 5, "comentario": "Ótimo para crianças." }
 
 ### 13 - Avaliar com nota 7 (esperado: 400)
-POST {{api}}/atracoes/{{criada.response.body.id}}/avaliacoes
+POST {{api}}/atracoes/{{criada.response.body.$.id}}/avaliacoes
 Content-Type: application/json
 
 { "visitante": "Ana", "nota": 7 }
 
 ### 14 - Remover (esperado: 204; a avaliação do teste 12 some junto)
-DELETE {{api}}/atracoes/{{criada.response.body.id}}
+DELETE {{api}}/atracoes/{{criada.response.body.$.id}}
 
 ### 15 - Remover de novo (esperado: 404)
-DELETE {{api}}/atracoes/{{criada.response.body.id}}
+DELETE {{api}}/atracoes/{{criada.response.body.$.id}}
 
 ### ---------- Extras e desafios ----------
 
