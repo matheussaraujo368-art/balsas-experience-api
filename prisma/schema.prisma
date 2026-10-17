@@ -1,0 +1,45 @@
+// Gera o cliente em JavaScript dentro de node_modules (importado como @prisma/client)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Na versão 7 a URL não fica aqui: ela mora no prisma.config.ts
+datasource db {
+  provider = "postgresql"
+}
+
+model Categoria {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  atracoes Atracao[]
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  atracoes Atracao[]
+}
+
+model Atracao {
+  id                Int         @id @default(autoincrement())
+  nome              String
+  descricao         String
+  cidade            String      @default("Balsas")
+  estado            String      @default("MA")
+  distanciaCentroKm Int?
+  criadaEm          DateTime    @default(now())
+  categoriaId       Int
+  categoria         Categoria   @relation(fields: [categoriaId], references: [id])
+  tags              Tag[]
+  avaliacoes        Avaliacao[]
+}
+
+model Avaliacao {
+  id         Int      @id @default(autoincrement())
+  visitante  String
+  nota       Int
+  comentario String?
+  criadaEm   DateTime @default(now())
+  atracaoId  Int
+  atracao    Atracao  @relation(fields: [atracaoId], references: [id], onDelete: Cascade)
+}
